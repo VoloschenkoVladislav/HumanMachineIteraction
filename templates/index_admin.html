@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+
+{% load static %}
+
+<html>
+    <head>
+        <title>Адресная книга</title>
+        <meta charset="utf-8">
+        <link rel="stylesheet" href={% static 'styles/index.css' %}>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+        <script type="text/javascript" src={% static 'scripts/modal-window.js' %}></script>
+        <script type="text/javascript" src={% static 'scripts/filter.js' %}></script>
+        <script type="text/javascript" src={% static 'scripts/search.js' %}></script>
+        <script type="text/javascript" src={% static 'scripts/get-record-info.js' %}></script>
+        <script type="text/javascript" src={% static 'scripts/auth.js' %}></script>
+        <script type="text/javascript" src={% static 'scripts/record-actions.js' %}></script>
+    </head>
+    
+    <body>
+        
+        <div id="overlay"></div>
+
+        <div class="section-about-us">
+            <header>
+                <div class="administrator-privilegies">
+                    <label class="modal-open" href="#applicants-window">Новые заявки в администраторы</label>
+                    <label onclick="logOut();return false;">Выйти</label>
+                </div>
+            </header>
+            <div>
+                <h1 class="center">NSTU Address Book</h1>
+                <h3 class="center">Найди быстро и легко</h3>
+            </div>
+        </div>
+        
+        <div class="section-search">
+            <div class="search-line">
+                <form action="" name="search" onsubmit="sendSearchRequest();return false;">
+                    <input type="search" id="request" placeholder="Введите запрос...">
+                    <div class="search-submit">
+                        <input type="image" src={% static 'img/search-icon.png '%}>
+                    </div>
+                </form>
+            </div>
+
+            <div class="filter-bar">
+                <label>Категория поиска:</label>
+                <label class="filter-button active" id="filter-name">ФИО</label>
+                <label class="filter-button" id="filter-address">Адрес</label>
+                <label class="filter-button" id="filter-phone">Номер телефона</label>
+                <label class="filter-button" id="filter-email">E-mail</label>
+                <label class="filter-button" id="filter-cathegory">Категория</label>
+            </div>
+
+            <div class="about-search">
+                <ul id="search-result">
+                    <li class="new-record modal-open" href="#create-record">Создать новую запись</li>
+                    {% for record in records %}
+                        <li class="modal-open" href="#record" onclick="getRecordInfo({{ record.id }});return false;">
+                            <label>{{ record.surname }} {{ record.name }} {{ record.middleName }}</label>
+                            <label>г. {{ record.city }} ул. {{ record.street }} д. {{ record.houseNumber }}, {{ record.flatNumber }}</label>
+                            <label>{{ record.phoneNumber }}</label>
+                        </li>
+                    {% endfor %}
+                </ul>
+               {% comment %} <p>Введите запрос в поисковую строку и получите результаты!</p> {% endcomment %}
+            </div>
+        </div>
+
+        <footer>
+            <div id="authors">
+                <p>Авторы проекта, студенты НГТУ группы ПМИ-81:<br>Волощенко Владислав<br>Головко Даниил</p>
+            </div>
+            <div id="personal-website">
+                <a href="http://fpm2.ami.nstu.ru/~pmi-b8502/">Веб-сайт с прочими работами авторов</a> 
+            </div>
+            <div id="how-to-be-admin">
+                <a href="/admin">Страница администратора Django</a>
+            </div>
+        </footer>
+
+
+
+
+
+
+
+
+
+
+
+
+        <div class="modal-window" id="record">
+            <div class="window-name">
+                <p>Подробнее о записи</p>
+            </div>
+            <div class="window-in">
+                <div class="record__info"></div>
+                <div class="modal-button-div">
+                    <label class="modal-swap modal-button-label" href="#edit-record" onclick="transformToEdit();return false;">Редактировать</label>
+                    <label class="modal-swap modal-button-label" href="#record-delete-confirm">Удалить</label>
+                    <label class="modal-close modal-button-label">Назад</label>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal-window" id="applicants-window">
+            <div class="window-name">
+                <p>Заявки в администраторы</p>
+            </div>
+            <div class="window-in">
+                <div class="record__info">
+                    <ul>
+                        {% if applicants %}
+                            {% for applicant in applicants %}
+                                <li>
+                                    <div class="info-applicant">
+                                        <label>{{ applicant.login }}</label>
+                                        <label>{{ applicant.email }}</label>
+                                    </div>
+                                    <div class="choice-applicant">
+                                        <label class="accept-applicant modal-button-label" onclick="acceptApplicant({{ applicant.id }});return false;">Принять</label>
+                                        <label class="cancel-applicant modal-button-label" onclick="cancelApplicant({{ applicant.id }});return false;">Отклонить</label>
+                                    </div>
+                                </li>
+                            {% endfor %}
+                        {% else %}
+                            <p>На данный момент заявок нет</p>
+                        {% endif %}
+                    </ul>
+                </div>
+                <div class="modal-button-div">
+                    <label class="modal-close modal-button-label">Назад</label>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal-window" id="edit-record">
+            <div class="window-name">
+                <p>Редактирование записи</p>
+            </div>
+            <div class="window-in">
+                <form onsubmit="saveChanges();return false;">
+                    <div>
+                        <ul>
+                            <li><div class="left-align">Фамилия:</div><div class="right-align"><input type="text" name="surname"></div></li>
+                            <li><div class="left-align">Имя:</div><div class="right-align"><input type="text" name="name"></div></li>
+                            <li><div class="left-align">Отчество:</div><div class="right-align"><input type="text" name="middlename"></div></li>
+                            <li><div class="left-align">Возраст:</div><div class="right-align"><input type="text" name="age"></div></li>
+                            <li><div class="left-align">Город:</div><div class="right-align"><input type="text" name="city"></div></li>
+                            <li><div class="left-align">Улица:</div><div class="right-align"><input type="text" name="street"></div></li>
+                            <li><div class="left-align">Дом:</div><div class="right-align"><input type="text" name="house"></div></li>
+                            <li><div class="left-align">Квартира:</div><div class="right-align"><input type="text" name="flat"></div></li>
+                            <li><div class="left-align">E-mail:</div><div class="right-align"><input type="text" name="email"></div></li>
+                            <li><div class="left-align">Телефон:</div><div class="right-align"><input type="text" name="phone"></div></li>
+                            <li><div class="left-align">Категория:</div><div class="right-align"><input type="text" name="cathegory"></div></li>
+                        </ul>
+                    </div>
+                    <div class="modal-button-div">
+                        <input type="submit" value="Сохранить">
+                        <label class="modal-swap modal-button-label" href="#record">Отмена</label>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <div class="modal-window" id="record-delete-confirm">
+            <div class="window-name">
+                <p>Удаление записи</p>
+            </div>
+            <div class="window-in">
+                <div class="inside-modal-label">
+                    <label>Вы уверены, что хотите удалить запись?</label>
+                </div>
+                <div class="modal-button-div">
+                    <label class="record-delete modal-swap modal-button-label" href="#modal-done">Да</label>
+                    <label class="modal-swap modal-button-label" href="#record">Нет</label>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal-window" id="create-record">
+            <div class="window-name">
+                <p>Создание записи</p>
+            </div>
+            <div class="window-in">
+                <form onsubmit="newRecord();return false;">
+                    <ul>
+                        <li>
+                            <div class="left-align">Фамилия:</div>
+                            <div class="right-align"><input type="text" name="surname"></div>
+                        </li>
+                        <li>
+                            <div class="left-align">Имя:</div>
+                            <div class="right-align"><input type="text" name="name"></div>
+                        </li>
+                        <li>
+                            <div class="left-align">Отчество:</div>
+                            <div class="right-align"><input type="text" name="middlename"></div>
+                        </li>
+                        <li>
+                            <div class="left-align">Возраст:</div>
+                            <div class="right-align"><input type="text" name="age"></div>
+                        </li>
+                        <li>
+                            <div class="left-align">Город:</div>
+                            <div class="right-align"><input type="text" name="city"></div>
+                        </li>
+                        <li>
+                            <div class="left-align">Улица:</div>
+                            <div class="right-align"><input type="text" name="street"></div>
+                        </li>
+                        <li>
+                            <div class="left-align">Дом:</div>
+                            <div class="right-align"><input type="text" name="house"></div>
+                        </li>
+                        <li>
+                            <div class="left-align">Квартира:</div>
+                            <div class="right-align"><input type="text" name="flat"></div>
+                        </li>
+                        <li>
+                            <div class="left-align">E-mail:</div>
+                            <div class="right-align"><input type="text" name="email"></div>
+                        </li>
+                        <li>
+                            <div class="left-align">Телефон:</div>
+                            <div class="right-align"><input type="text" name="phone"></div>
+                        </li>
+                        <li>
+                            <div class="left-align">Категория:</div>
+                            <div class="right-align"><input type="text" name="cathegory"></div>
+                        </li>
+                    </ul>
+                    <div class="modal-button-div">
+                        <input class="record-save" type="submit" value="Сохранить">
+                        <label class="modal-close modal-button-label">Отмена</label>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <div class="modal-window" id="modal-done">
+            <div class="window-name">
+            </div>
+            <div class="window-in">
+                <div class="done__info"></div>
+                <div class="modal-button-div">
+                    <label class="modal-close modal-button-label">Ок</label>
+                </div>
+            </div>
+        </div>
+
+    </body>
+</html>

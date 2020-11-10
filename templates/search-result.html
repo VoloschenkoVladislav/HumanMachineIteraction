@@ -1,0 +1,7 @@
+{% for record in records %}
+    <li class="modal-open" href="#record" onclick="getRecordInfo({{ record.id }});return false;">
+        <label>{{ record.surname }} {{ record.name }} {{ record.middleName }}</label>
+        <label>г. {{ record.city }} ул. {{ record.street }} д. {{ record.houseNumber }}, {{ record.flatNumber }}</label>
+        <label>{{ record.phoneNumber }}</label>
+    </li>
+{% endfor %}

@@ -1,0 +1,14 @@
+<ul>
+    {% comment %} <li>ФИО: {{ record.surname }} {{ record.name }} {{ record.middleName }}</li> {% endcomment %}
+    <li><div class="left-align">Фамилия:</div><div class="right-align" id="surname-label">{{ record.surname }}</div></li>
+    <li><div class="left-align">Имя:</div><div class="right-align" id="name-label">{{ record.name }}</div></li>
+    <li><div class="left-align">Отчество:</div><div class="right-align" id="middlename-label">{{ record.middleName }}</div></li>
+    <li><div class="left-align">Возраст:</div><div class="right-align" id="age-label">{{ record.age }}</div></li>
+    <li><div class="left-align">Город:</div><div class="right-align" id="city-label">{{ record.city }}</div></li>
+    <li><div class="left-align">Улица:</div><div class="right-align" id="street-label">{{ record.street }}</div></li>
+    <li><div class="left-align">Дом:</div><div class="right-align" id="house-label">{{ record.houseNumber }}</div></li>
+    <li><div class="left-align">Квартира:</div><div class="right-align" id="flat-label">{{ record.flatNumber }}</div></li>
+    <li><div class="left-align">E-mail:</div><div class="right-align" id="email-label">{{ record.email }}</div></li>
+    <li><div class="left-align">Телефон:</div><div class="right-align" id="phone-label">{{ record.phoneNumber }}</div></li>
+    <li><div class="left-align">Категория:</div class="right-align" id="cathegory-label">{{ record.cathegory }}</div></li>
+</ul>

@@ -1,0 +1,18 @@
+<ul>
+    {% if applicants %}
+        {% for applicant in applicants %}
+            <li>
+                <div class="info-applicant">
+                    <label>{{ applicant.login }}</label>
+                    <label>{{ applicant.email }}</label>
+                </div>
+                <div class="choice-applicant">
+                    <label class="accept-applicant modal-button-label" onclick="acceptApplicant({{ applicant.id }});return false;">Принять</label>
+                    <label class="cancel-applicant modal-button-label" onclick="cancelApplicant({{ applicant.id }});return false;">Отклонить</label>
+                </div>
+            </li>
+        {% endfor %}
+    {% else %}
+        <p>На данный момент заявок нет</p>
+    {% endif %}
+</ul>

@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+
+{% load static %}
+
+<html>
+    <head>
+        <title>Адресная книга</title>
+        <meta charset="utf-8">
+        <link rel="stylesheet" href={% static 'styles/index.css' %}>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+        <script type="text/javascript" src={% static 'scripts/modal-window.js' %}></script>
+        <script type="text/javascript" src={% static 'scripts/filter.js' %}></script>
+        <script type="text/javascript" src={% static 'scripts/search.js' %}></script>
+        <script type="text/javascript" src={% static 'scripts/get-record-info.js' %}></script>
+        <script type="text/javascript" src={% static 'scripts/auth.js' %}></script>
+        <script type="text/javascript" src={% static 'scripts/be-admin.js' %}></script>
+    </head>
+    
+    <body>
+        
+        <div id="overlay"></div>
+
+        <div class="section-about-us">
+            <header>
+                <div class="administrator-privilegies">
+                    <label class="modal-open" href="#auth-window">Войти как администратор</label>
+                </div>
+            </header>
+            <div>
+                <h1 class="center">NSTU Address Book</h1>
+                <h3 class="center">Найди быстро и легко</h3>
+            </div>
+        </div>
+        
+        <div class="section-search">
+            <div class="search-line">
+                <form action="" name="search" onsubmit="sendSearchRequest();return false;">
+                    <input type="search" id="request" placeholder="Введите запрос...">
+                    <div class="search-submit">
+                        <input type="image" src={% static 'img/search-icon.png '%}>
+                    </div>
+                </form>
+            </div>
+
+            <div class="filter-bar">
+                <label>Категория поиска:</label>
+                <label class="filter-button active" id="filter-name">ФИО</label>
+                <label class="filter-button" id="filter-address">Адрес</label>
+                <label class="filter-button" id="filter-phone">Номер телефона</label>
+                <label class="filter-button" id="filter-email">E-mail</label>
+                <label class="filter-button" id="filter-cathegory">Категория</label>
+            </div>
+
+            <div class="about-search">
+                <ul id="search-result">
+                    {% for record in records %}
+                        <li class="modal-open" href="#record" onclick="getRecordInfo({{ record.id }});return false;">
+                            <label>{{ record.surname }} {{ record.name }} {{ record.middleName }}</label>
+                            <label>г. {{ record.city }} ул. {{ record.street }} д. {{ record.houseNumber }}, {{ record.flatNumber }}</label>
+                            <label>{{ record.phoneNumber }}</label>
+                        </li>
+                    {% endfor %}
+                </ul>      
+            </div>
+        </div>
+
+        <footer>
+            <div id="authors">
+                <p>Авторы проекта, студенты НГТУ группы ПМИ-81:<br>Волощенко Владислав<br>Головко Даниил</p>
+            </div>
+            <div id="personal-website">
+                <a href="http://fpm2.ami.nstu.ru/~pmi-b8502/">Веб-сайт с прочими работами авторов</a> 
+            </div>
+            <div id="how-to-be-admin">
+                <p>Вы можете поучаствовать в развитии проекта:</p>
+                <label id="be-admin" class="modal-open" href="#be-admin-window">Стать адмнинистратором</label>
+            </div>
+        </footer>
+
+
+
+
+
+
+
+
+
+
+
+        <div class="modal-window" id="auth-window">
+            <div class="window-name">
+                <p>Авторизация</p>
+            </div>
+            <div class="window-in">
+                <form onsubmit="sendAuthRequest();return false;">
+                    <div class="modal-form-div">
+                        <label for="admin-login">Введите логин: </label>
+                        <input type="text" name="admin-login">
+                    </div>
+                    <div class="modal-form-div">
+                        <label for="admin-password">Введите пароль: </label>
+                        <input type="password" name="admin-password">
+                    </div>
+                    <div class="modal-button-div">
+                        <input class="modal-submit" type="submit" name="admin-auth-submit" value="Войти">
+                        <label class="modal-close modal-button-label">Отмена</label>
+                    </div>
+                    <div class="modal-other">
+                        <a class="modal-swap" href="#be-admin-window">Зарегистрироваться</a>
+                        <label class="error-label"></label>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <div class="modal-window" id="be-admin-window">
+            <div class="window-name">
+                <p>Регистрация</p>
+            </div>
+            <div class="window-in">
+                <form onsubmit="sendAdminRequest();return false;">
+                    <div class="modal-form-div">
+                        <label for="admin-login">Введите электронную почту: </label>
+                        <input type="text" name="user-email">
+                    </div>
+                    <div class="modal-form-div">
+                        <label for="admin-login">Введите новый логин: </label>
+                        <input type="text" name="user-login">
+                    </div>
+                    <div class="modal-form-div">
+                        <label for="user-password">Введите пароль: </label>
+                        <input type="password" name="user-password">
+                    </div>
+                    <div class="modal-form-div">
+                        <label for="user-password-again">Повторите ввод пароля: </label>
+                        <input type="password" name="user-password-again">
+                    </div>
+                    <div class="modal-button-div">
+                        <input class="modal-submit" type="submit" href="#modal-done" name="user-auth-submit" value="Отправить заявку">
+                        <label class="modal-close modal-button-label">Отмена</label>
+                    </div>
+                    <div class="modal-other">
+                        <label class="error-label"></label>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <div class="modal-window" id="modal-done">
+            <div class="window-name">
+            </div>
+            <div class="window-in">
+                <div class="done__info"></div>
+                <div class="modal-button-div">
+                    <label class="modal-close modal-button-label">Ок</label>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal-window" id="record">
+            <div class="window-name">
+                <p>Подробнее о записи</p>
+            </div>
+            <div class="window-in">
+                <div class="record__info"></div>
+                <div class="modal-button-div">
+                        <label class="modal-close modal-button-label">Назад</label>
+                </div>
+            </div>
+        </div>
+
+    </body>
+</html>
